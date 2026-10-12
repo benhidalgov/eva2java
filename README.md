@@ -174,8 +174,9 @@ crítico de concurrencia señalado en el diagrama.
 
 Colección: [`postman/EventPass.postman_collection.json`](postman/EventPass.postman_collection.json)
 
-Importar en Postman → correr la colección completa. Incluye 24 requests con
-tests automáticos de código HTTP, mensajes y datos:
+Importar en Postman → correr la colección completa. Son **27 requests y 52
+assertions** automáticas de código HTTP, mensajes y datos. La colección es
+idempotente: se puede correr cuantas veces se quiera sin reiniciar la API:
 
 - **Casos de éxito**: CRUD completo de eventos y usuarios, creación de orden
   (verifica que emite un ticket por entrada), validación de ticket.
