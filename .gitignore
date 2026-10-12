@@ -1,0 +1,17 @@
+# Build de Maven
+target/
+
+# Base de datos H2 generada en runtime
+data/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# Sistema
+.DS_Store
+Thumbs.db
