@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -24,6 +25,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiError> noEncontrado(ResourceNotFoundException ex, HttpServletRequest req) {
         return responder(HttpStatus.NOT_FOUND, ex.getMessage(), req);
+    }
+
+    /** Ruta inexistente (ej. abrir "/" en el navegador) -> 404 con la guía */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiError> rutaInexistente(NoResourceFoundException ex, HttpServletRequest req) {
+        String mensaje = "Ruta '" + req.getRequestURI() + "' inexistente. "
+                + "Usa /api/eventos, /api/usuarios, /api/ordenes o /api/tickets";
+        return responder(HttpStatus.NOT_FOUND, mensaje, req);
     }
 
     /** Conflicto de estado (aforo agotado, duplicado) -> 409 */
