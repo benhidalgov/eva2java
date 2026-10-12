@@ -2,6 +2,7 @@ package com.eventpass.eventos.dto;
 
 import com.eventpass.eventos.model.Evento;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -14,7 +15,8 @@ public record EventoResponse(
         LocalDateTime fecha,
         String lugar,
         int aforoTotal,
-        int aforoDisponible
+        int aforoDisponible,
+        BigDecimal precio
 ) {
 
     public static EventoResponse desde(Evento evento) {
@@ -25,7 +27,8 @@ public record EventoResponse(
                 evento.getFecha(),
                 evento.getLugar(),
                 evento.getAforoTotal(),
-                evento.getAforoDisponible()
+                evento.getAforoDisponible(),
+                evento.getPrecio()
         );
     }
 

@@ -1,9 +1,11 @@
 package com.eventpass.eventos.dto;
 
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -23,6 +25,10 @@ public record EventoRequest(
 
         @NotNull(message = "el aforo total es obligatorio")
         @Min(value = 1, message = "el aforo total debe ser al menos 1")
-        Integer aforoTotal
+        Integer aforoTotal,
+
+        @NotNull(message = "el precio es obligatorio")
+        @DecimalMin(value = "0", message = "el precio no puede ser negativo")
+        BigDecimal precio
 ) {
 }

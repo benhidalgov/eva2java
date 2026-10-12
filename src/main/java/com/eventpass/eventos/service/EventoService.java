@@ -42,7 +42,8 @@ public class EventoService {
                 request.descripcion(),
                 request.fecha(),
                 request.lugar(),
-                request.aforoTotal()
+                request.aforoTotal(),
+                request.precio()
         );
         return EventoResponse.desde(eventos.save(evento));
     }
@@ -55,6 +56,7 @@ public class EventoService {
         evento.setFecha(request.fecha());
         evento.setLugar(request.lugar());
         evento.setAforoTotal(request.aforoTotal());
+        evento.setPrecio(request.precio());
         if (evento.getAforoDisponible() > request.aforoTotal()) {
             evento.setAforoDisponible(request.aforoTotal());
         }
