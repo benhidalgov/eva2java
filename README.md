@@ -96,6 +96,7 @@ spring.h2.console.enabled=true
 
 | Método | Ruta                                  | Descripción                        | Éxito |
 |--------|---------------------------------------|------------------------------------|-------|
+| GET    | `/`                                   | Índice de endpoints disponibles    | 200 |
 | GET    | `/api/eventos`                        | Lista eventos (filtro `?nombre=`)  | 200 |
 | GET    | `/api/eventos/{id}`                   | Detalle de evento                  | 200 |
 | POST   | `/api/eventos`                        | Crea evento                        | 201 |
