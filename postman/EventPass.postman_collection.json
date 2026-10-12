@@ -331,12 +331,58 @@
             "method": "GET",
             "url": { "raw": "{{baseUrl}}/api/usuarios/9999", "host": [ "{{baseUrl}}" ], "path": [ "api", "usuarios", "9999" ] }
           }
+        },
+        {
+          "name": "Eliminar usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 204 No Content', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/usuarios/{{usuarioId}}", "host": [ "{{baseUrl}}" ], "path": [ "api", "usuarios", "{{usuarioId}}" ] }
+          }
         }
       ]
     },
     {
       "name": "3. Órdenes",
       "item": [
+        {
+          "name": "Crear evento con aforo mínimo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201 Created', () => pm.response.to.have.status(201));",
+                  "pm.test('Aforo disponible = total', () => {",
+                  "  const e = pm.response.json();",
+                  "  pm.expect(e.aforoDisponible).to.equal(1);",
+                  "  pm.collectionVariables.set('eventoAforoId', e.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Evento aforo minimo\",\n  \"descripcion\": \"Se usa para probar el 409 de aforo insuficiente\",\n  \"fecha\": \"2026-10-01T18:00:00\",\n  \"lugar\": \"Sala minima\",\n  \"aforoTotal\": 1,\n  \"precio\": 1000\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/eventos", "host": [ "{{baseUrl}}" ], "path": [ "api", "eventos" ] }
+          }
+        },
         {
           "name": "Crear orden (compra de entradas)",
           "event": [
@@ -423,7 +469,7 @@
             "header": [ { "key": "Content-Type", "value": "application/json" } ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"usuarioId\": 2,\n  \"eventoId\": 3,\n  \"cantidad\": 50\n}"
+              "raw": "{\n  \"usuarioId\": 2,\n  \"eventoId\": {{eventoAforoId}},\n  \"cantidad\": 2\n}"
             },
             "url": { "raw": "{{baseUrl}}/api/ordenes", "host": [ "{{baseUrl}}" ], "path": [ "api", "ordenes" ] }
           }
@@ -481,6 +527,34 @@
     {
       "name": "4. Tickets",
       "item": [
+        {
+          "name": "Crear orden para validar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201 Created', () => pm.response.to.have.status(201));",
+                  "pm.test('Guarda el código QR del ticket', () => {",
+                  "  const o = pm.response.json();",
+                  "  pm.expect(o.tickets[0].codigoQr).to.match(/^[A-Z0-9]{12}$/);",
+                  "  pm.collectionVariables.set('codigoQr', o.tickets[0].codigoQr);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": 3,\n  \"eventoId\": 1,\n  \"cantidad\": 1\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/ordenes", "host": [ "{{baseUrl}}" ], "path": [ "api", "ordenes" ] }
+          }
+        },
         {
           "name": "Listar tickets",
           "event": [
