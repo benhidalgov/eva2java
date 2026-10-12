@@ -1,0 +1,14 @@
+$kind: http-request
+method: GET
+url: '{{baseUrl}}/api/eventos/1'
+order: 3000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 200', () => pm.response.to.have.status(200));
+      pm.test('Tiene aforo y precio', () => {
+        const e = pm.response.json();
+        pm.expect(e).to.have.property('aforoDisponible');
+        pm.expect(e).to.have.property('precio');
+      });

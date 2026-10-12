@@ -1,0 +1,10 @@
+$kind: http-request
+method: GET
+url: '{{baseUrl}}/api/eventos'
+order: 1000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 200', () => pm.response.to.have.status(200));
+      pm.test('Devuelve al menos un evento', () => pm.expect(pm.response.json().length).to.be.above(0));

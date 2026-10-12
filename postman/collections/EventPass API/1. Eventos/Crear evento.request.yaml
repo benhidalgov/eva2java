@@ -1,0 +1,29 @@
+$kind: http-request
+method: POST
+url: '{{baseUrl}}/api/eventos'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "Concierto Postman",
+      "descripcion": "Creado desde la colección",
+      "fecha": "2026-09-20T21:00:00",
+      "lugar": "Sala Providencia",
+      "aforoTotal": 150,
+      "precio": 18990
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 201 Created', () => pm.response.to.have.status(201));
+      pm.test('Devuelve el id creado', () => {
+        const e = pm.response.json();
+        pm.expect(e.id).to.be.a('number');
+        pm.expect(e.aforoDisponible).to.equal(e.aforoTotal);
+        pm.collectionVariables.set('eventoId', e.id);
+      });

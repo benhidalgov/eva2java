@@ -1,0 +1,24 @@
+$kind: http-request
+method: PUT
+url: '{{baseUrl}}/api/eventos/{{eventoId}}'
+order: 5000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "Concierto Postman Editado",
+      "descripcion": "Actualizado desde la colección",
+      "fecha": "2026-09-21T21:00:00",
+      "lugar": "Sala Providencia",
+      "aforoTotal": 200,
+      "precio": 19990
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 200', () => pm.response.to.have.status(200));
+      pm.test('El nombre cambió', () => pm.expect(pm.response.json().nombre).to.equal('Concierto Postman Editado'));

@@ -1,0 +1,12 @@
+$kind: http-request
+name: 'ERROR 404 - Evento inexistente'
+method: GET
+url: '{{baseUrl}}/api/eventos/9999'
+order: 7000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Status 404', () => pm.response.to.have.status(404));
+      pm.test('Mensaje de error', () => pm.expect(pm.response.json().message).to.include('Evento no encontrado'));
+      pm.test('Devuelve el path', () => pm.expect(pm.response.json().path).to.equal('/api/eventos/9999'));

@@ -1,0 +1,13 @@
+$kind: collection
+description: |-
+  Pruebas de la API REST de EventPass.
+
+  Cobertura: CRUD completo, casos de éxito y casos de error (400, 404, 409).
+  Requiere la aplicación corriendo en http://localhost:8080
+variables:
+  baseUrl: http://localhost:8080
+  eventoId: ""
+  usuarioId: ""
+  ordenId: ""
+  codigoQr: ""
+  eventoAforoId: ""
