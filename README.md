@@ -16,12 +16,49 @@ paquete del código representa un microservicio del diagrama.
 
 ---
 
-## 1. Requisitos
+## 1. Clonar el repositorio
 
-- JDK 21
-- Maven 3.9+
+```bash
+git clone <URL_DEL_REPO> eventpass
+cd eventpass
+git checkout main        # rama estable de la release
+```
 
-## 2. Cómo ejecutar
+## 2. Requisitos e instalación
+
+Necesitas **JDK 21** y **Maven 3.9+**.
+
+**JDK 21 (Windows / PowerShell):**
+
+```powershell
+winget install --id EclipseAdoptium.Temurin.21.JDK --exact
+```
+
+**Maven 3.9 (Windows):** no está en winget, se instala descomprimiendo el binario:
+
+```powershell
+Invoke-WebRequest https://archive.apache.org/dist/maven/maven-3/3.9.11/binaries/apache-maven-3.9.11-bin.zip -OutFile $env:TEMP\maven.zip
+Expand-Archive $env:TEMP\maven.zip "$env:LOCALAPPDATA\Programs" -Force
+$m = "$env:LOCALAPPDATA\Programs\apache-maven-3.9.11\bin"
+[Environment]::SetEnvironmentVariable("Path", "$([Environment]::GetEnvironmentVariable('Path','User')); $m", "User")
+```
+
+**Verificar la instalación** (abre una terminal nueva):
+
+```bash
+java -version    # debe indicar 21.x
+mvn -v           # debe indicar 3.9.x
+```
+
+**En IntelliJ IDEA:** *File → Open* y selecciona el `pom.xml` (no la carpeta);
+IDEA importa el proyecto Maven y descarga las dependencias solas.
+
+## 3. Ejecutar
+
+**Opción A — Windows (recomendada):** doble clic en [`arrancar.bat`](arrancar.bat).
+Ejecuta `mvn clean install` y arranca la API en `http://localhost:8081`.
+
+**Opción B — manual:**
 
 ```bash
 mvn clean install          # compila, corre pruebas y genera el .jar
@@ -33,7 +70,13 @@ La API queda en `http://localhost:8080`.
 > Si el puerto 8080 está ocupado (por ejemplo por Steam), arranca con
 > `java -jar target/eventpass-1.0.0.jar --server.port=8081`.
 
-## 3. Base de datos (H2)
+Comprueba que quedó arriba:
+
+```bash
+curl http://localhost:8080/api/eventos
+```
+
+## 4. Base de datos (H2)
 
 Configuración en [`src/main/resources/application.properties`](src/main/resources/application.properties):
 
@@ -49,7 +92,7 @@ spring.h2.console.enabled=true
 - `src/main/resources/data.sql` carga usuarios y eventos de ejemplo en cada
   arranque (sentencias idempotentes, no duplican registros).
 
-## 4. Endpoints
+## 5. Endpoints
 
 | Método | Ruta                                  | Descripción                        | Éxito |
 |--------|---------------------------------------|------------------------------------|-------|
@@ -90,7 +133,7 @@ Toda la API responde con el mismo cuerpo `ApiError`:
 El manejo centralizado está en
 [`GlobalExceptionHandler`](src/main/java/com/eventpass/common/exception/GlobalExceptionHandler.java).
 
-## 5. Estructura en capas
+## 6. Estructura en capas
 
 ```
 src/main/java/com/eventpass/
@@ -127,7 +170,7 @@ int descontarAforo(Long id, int cantidad);
 Si devuelve `0` filas, no queda aforo y la API responde `409`. Es el punto
 crítico de concurrencia señalado en el diagrama.
 
-## 6. Pruebas en Postman
+## 7. Pruebas en Postman
 
 Colección: [`postman/EventPass.postman_collection.json`](postman/EventPass.postman_collection.json)
 
@@ -139,7 +182,7 @@ tests automáticos de código HTTP, mensajes y datos:
 - **Casos de error**: 400 (validación e id no numérico), 404 (recurso
   inexistente) y 409 (aforo insuficiente, email duplicado, ticket revalidado).
 
-## 7. Compilar y empaquetar (Maven)
+## 8. Compilar y empaquetar (Maven)
 
 ```bash
 mvn clean        # limpia target/
@@ -151,7 +194,7 @@ java -jar target/eventpass-1.0.0.jar
 El `pom.xml` está documentado sección por sección (dependencias, propiedades
 y plugins).
 
-## 8. Flujo de Git
+## 9. Flujo de Git
 
 ```
 main ──●──────────────●  (release final)
@@ -163,5 +206,13 @@ feature/*  ●  ●  ●
 
 - `main`: historia estable, solo recibe merges de `develop`.
 - `develop`: integración del trabajo en curso.
-- `feature/eventos-crud`, `feature/ordenes-tickets`: trabajo aislado.
+- `feature/eventos-crud`, `feature/ordenes-tickets`, `feature/script-arranque`:
+  trabajo aislado que se integra con `--no-ff`.
 - Commits con mensaje tipo `tipo(ámbito): descripción`.
+
+### Cómo verificar el flujo
+
+```bash
+git log --oneline --graph --all   # historial con merges
+git branch                        # main, develop y las feature/
+```
