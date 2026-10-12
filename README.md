@@ -19,7 +19,7 @@ paquete del código representa un microservicio del diagrama.
 ## 1. Clonar el repositorio
 
 ```bash
-git clone <URL_DEL_REPO> eventpass
+git clone https://github.com/benhidalgov/eva2java.git eventpass
 cd eventpass
 git checkout main        # rama estable de la release
 ```
