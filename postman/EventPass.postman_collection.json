@@ -1,0 +1,575 @@
+{
+  "info": {
+    "_postman_id": "7f3a1c2e-9d5b-4c8a-b1e4-2a6f0d9e5b31",
+    "name": "EventPass API",
+    "description": "Pruebas de la API REST de EventPass.\n\nCobertura: CRUD completo, casos de éxito y casos de error (400, 404, 409).\nRequiere la aplicación corriendo en http://localhost:8080",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" }
+  ],
+  "item": [
+    {
+      "name": "1. Eventos",
+      "item": [
+        {
+          "name": "Listar eventos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Devuelve al menos un evento', () => pm.expect(pm.response.json().length).to.be.above(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/eventos", "host": [ "{{baseUrl}}" ], "path": [ "api", "eventos" ] }
+          }
+        },
+        {
+          "name": "Buscar eventos por nombre",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('El nombre contiene el filtro', () => pm.expect(pm.response.json()[0].nombre.toLowerCase()).to.include('festival'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/eventos?nombre=festival",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "eventos" ],
+              "query": [ { "key": "nombre", "value": "festival" } ]
+            }
+          }
+        },
+        {
+          "name": "Obtener evento por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Tiene aforo y precio', () => {",
+                  "  const e = pm.response.json();",
+                  "  pm.expect(e).to.have.property('aforoDisponible');",
+                  "  pm.expect(e).to.have.property('precio');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/eventos/1", "host": [ "{{baseUrl}}" ], "path": [ "api", "eventos", "1" ] }
+          }
+        },
+        {
+          "name": "Crear evento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201 Created', () => pm.response.to.have.status(201));",
+                  "pm.test('Devuelve el id creado', () => {",
+                  "  const e = pm.response.json();",
+                  "  pm.expect(e.id).to.be.a('number');",
+                  "  pm.expect(e.aforoDisponible).to.equal(e.aforoTotal);",
+                  "  pm.collectionVariables.set('eventoId', e.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Concierto Postman\",\n  \"descripcion\": \"Creado desde la colección\",\n  \"fecha\": \"2026-09-20T21:00:00\",\n  \"lugar\": \"Sala Providencia\",\n  \"aforoTotal\": 150,\n  \"precio\": 18990\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/eventos", "host": [ "{{baseUrl}}" ], "path": [ "api", "eventos" ] }
+          }
+        },
+        {
+          "name": "Actualizar evento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('El nombre cambió', () => pm.expect(pm.response.json().nombre).to.equal('Concierto Postman Editado'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Concierto Postman Editado\",\n  \"descripcion\": \"Actualizado desde la colección\",\n  \"fecha\": \"2026-09-21T21:00:00\",\n  \"lugar\": \"Sala Providencia\",\n  \"aforoTotal\": 200,\n  \"precio\": 19990\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/eventos/{{eventoId}}", "host": [ "{{baseUrl}}" ], "path": [ "api", "eventos", "{{eventoId}}" ] }
+          }
+        },
+        {
+          "name": "Eliminar evento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 204 No Content', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/eventos/{{eventoId}}", "host": [ "{{baseUrl}}" ], "path": [ "api", "eventos", "{{eventoId}}" ] }
+          }
+        },
+        {
+          "name": "ERROR 404 - Evento inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Mensaje de error', () => pm.expect(pm.response.json().message).to.include('Evento no encontrado'));",
+                  "pm.test('Devuelve el path', () => pm.expect(pm.response.json().path).to.equal('/api/eventos/9999'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/eventos/9999", "host": [ "{{baseUrl}}" ], "path": [ "api", "eventos", "9999" ] }
+          }
+        },
+        {
+          "name": "ERROR 400 - Validación de campos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Detalle por campo', () => {",
+                  "  const f = pm.response.json().fieldErrors;",
+                  "  pm.expect(f).to.have.property('nombre');",
+                  "  pm.expect(f).to.have.property('lugar');",
+                  "  pm.expect(f).to.have.property('precio');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"\",\n  \"fecha\": \"2026-09-20T21:00:00\",\n  \"lugar\": \"\",\n  \"aforoTotal\": 0,\n  \"precio\": -1000\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/eventos", "host": [ "{{baseUrl}}" ], "path": [ "api", "eventos" ] }
+          }
+        },
+        {
+          "name": "ERROR 400 - Id no numérico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Menciona el parámetro', () => pm.expect(pm.response.json().message).to.include('id'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/eventos/abc", "host": [ "{{baseUrl}}" ], "path": [ "api", "eventos", "abc" ] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Usuarios",
+      "item": [
+        {
+          "name": "Listar usuarios",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('No expone contraseñas', () => pm.expect(pm.response.json()[0]).to.not.have.property('password'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/usuarios", "host": [ "{{baseUrl}}" ], "path": [ "api", "usuarios" ] }
+          }
+        },
+        {
+          "name": "Crear usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201 Created', () => pm.response.to.have.status(201));",
+                  "pm.test('Guarda el id', () => pm.collectionVariables.set('usuarioId', pm.response.json().id));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Postman User\",\n  \"email\": \"postman@eventpass.cl\",\n  \"password\": \"secreto123\",\n  \"rol\": \"COMPRADOR\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/usuarios", "host": [ "{{baseUrl}}" ], "path": [ "api", "usuarios" ] }
+          }
+        },
+        {
+          "name": "ERROR 409 - Email duplicado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409 Conflict', () => pm.response.to.have.status(409));",
+                  "pm.test('Mensaje de conflicto', () => pm.expect(pm.response.json().message).to.include('Ya existe un usuario'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Otro\",\n  \"email\": \"postman@eventpass.cl\",\n  \"password\": \"secreto123\",\n  \"rol\": \"COMPRADOR\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/usuarios", "host": [ "{{baseUrl}}" ], "path": [ "api", "usuarios" ] }
+          }
+        },
+        {
+          "name": "ERROR 400 - Email inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Error sobre el campo email', () => pm.expect(pm.response.json().fieldErrors.email).to.include('formato'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Inválido\",\n  \"email\": \"no-es-un-email\",\n  \"password\": \"secreto123\",\n  \"rol\": \"COMPRADOR\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/usuarios", "host": [ "{{baseUrl}}" ], "path": [ "api", "usuarios" ] }
+          }
+        },
+        {
+          "name": "ERROR 404 - Usuario inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Mensaje', () => pm.expect(pm.response.json().message).to.include('Usuario no encontrado'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/usuarios/9999", "host": [ "{{baseUrl}}" ], "path": [ "api", "usuarios", "9999" ] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Órdenes",
+      "item": [
+        {
+          "name": "Crear orden (compra de entradas)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201 Created', () => pm.response.to.have.status(201));",
+                  "pm.test('Emite un ticket por entrada', () => {",
+                  "  const o = pm.response.json();",
+                  "  pm.expect(o.tickets).to.have.lengthOf(o.cantidad);",
+                  "  pm.expect(o.estado).to.equal('ACEPTADA');",
+                  "  pm.collectionVariables.set('ordenId', o.id);",
+                  "  pm.collectionVariables.set('codigoQr', o.tickets[0].codigoQr);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": 2,\n  \"eventoId\": 1,\n  \"cantidad\": 2\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/ordenes", "host": [ "{{baseUrl}}" ], "path": [ "api", "ordenes" ] }
+          }
+        },
+        {
+          "name": "Listar órdenes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Trae órdenes con su detalle', () => pm.expect(pm.response.json()[0]).to.have.property('eventoNombre'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/ordenes", "host": [ "{{baseUrl}}" ], "path": [ "api", "ordenes" ] }
+          }
+        },
+        {
+          "name": "Eliminar orden (devuelve aforo)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 204 No Content', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/ordenes/{{ordenId}}", "host": [ "{{baseUrl}}" ], "path": [ "api", "ordenes", "{{ordenId}}" ] }
+          }
+        },
+        {
+          "name": "ERROR 409 - Aforo insuficiente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409 Conflict', () => pm.response.to.have.status(409));",
+                  "pm.test('Indica cuánto queda', () => pm.expect(pm.response.json().message).to.include('Aforo insuficiente'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": 2,\n  \"eventoId\": 3,\n  \"cantidad\": 50\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/ordenes", "host": [ "{{baseUrl}}" ], "path": [ "api", "ordenes" ] }
+          }
+        },
+        {
+          "name": "ERROR 404 - Usuario inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Mensaje', () => pm.expect(pm.response.json().message).to.include('Usuario no encontrado'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": 9999,\n  \"eventoId\": 1,\n  \"cantidad\": 1\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/ordenes", "host": [ "{{baseUrl}}" ], "path": [ "api", "ordenes" ] }
+          }
+        },
+        {
+          "name": "ERROR 400 - Cantidad fuera de rango",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Error sobre cantidad', () => pm.expect(pm.response.json().fieldErrors.cantidad).to.exist);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": 2,\n  \"eventoId\": 1,\n  \"cantidad\": 0\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/ordenes", "host": [ "{{baseUrl}}" ], "path": [ "api", "ordenes" ] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Tickets",
+      "item": [
+        {
+          "name": "Listar tickets",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Trae el código QR', () => pm.expect(pm.response.json()[0]).to.have.property('codigoQr'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/tickets", "host": [ "{{baseUrl}}" ], "path": [ "api", "tickets" ] }
+          }
+        },
+        {
+          "name": "Validar ticket en puerta (1ra vez)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Estado VALIDADO', () => pm.expect(pm.response.json().estado).to.equal('VALIDADO'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/tickets/validar/{{codigoQr}}",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "tickets", "validar", "{{codigoQr}}" ]
+            }
+          }
+        },
+        {
+          "name": "ERROR 409 - Ticket ya validado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409 Conflict', () => pm.response.to.have.status(409));",
+                  "pm.test('Indica que ya fue validado', () => pm.expect(pm.response.json().message).to.include('ya fue'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/tickets/validar/{{codigoQr}}",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "tickets", "validar", "{{codigoQr}}" ]
+            }
+          }
+        },
+        {
+          "name": "ERROR 404 - Código inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Mensaje', () => pm.expect(pm.response.json().message).to.include('Ticket no encontrado'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/tickets/validar/NOEXISTE0000",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "api", "tickets", "validar", "NOEXISTE0000" ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
