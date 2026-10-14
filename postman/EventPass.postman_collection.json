@@ -2,11 +2,11 @@
   "info": {
     "_postman_id": "7f3a1c2e-9d5b-4c8a-b1e4-2a6f0d9e5b31",
     "name": "EventPass API",
-    "description": "Pruebas de la API REST de EventPass.\n\nCobertura: CRUD completo, casos de éxito y casos de error (400, 404, 409).\nRequiere la aplicación corriendo en http://localhost:8080",
+    "description": "Pruebas de la API REST de EventPass.\n\nCobertura: CRUD completo, casos de éxito y casos de error (400, 404, 409).\nRequiere la aplicación corriendo en http://localhost:8081",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:8080" }
+    { "key": "baseUrl", "value": "http://localhost:8081" }
   ],
   "item": [
     {

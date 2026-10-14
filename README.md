@@ -65,15 +65,15 @@ mvn clean install          # compila, corre pruebas y genera el .jar
 java -jar target/eventpass-1.0.0.jar
 ```
 
-La API queda en `http://localhost:8080`.
+La API queda en `http://localhost:8081`.
 
-> Si el puerto 8080 está ocupado (por ejemplo por Steam), arranca con
-> `java -jar target/eventpass-1.0.0.jar --server.port=8081`.
+> El puerto por defecto es **8081** porque el 8080 suele estar ocupado por Steam.
+> Para usar otro puerto: `java -jar target/eventpass-1.0.0.jar --server.port=8090`.
 
 Comprueba que quedó arriba:
 
 ```bash
-curl http://localhost:8080/api/eventos
+curl http://localhost:8081/api/eventos
 ```
 
 ## 4. Base de datos (H2)
@@ -87,7 +87,7 @@ spring.h2.console.enabled=true
 ```
 
 - Los datos persisten en `./data/eventpass.mv.db` entre corridas.
-- Consola de inspección: `http://localhost:8080/h2-console`
+- Consola de inspección: `http://localhost:8081/h2-console`
   - *JDBC URL*: `jdbc:h2:file:./data/eventpass`, usuario `sa`, sin contraseña.
 - `src/main/resources/data.sql` carga usuarios y eventos de ejemplo en cada
   arranque (sentencias idempotentes, no duplican registros).
